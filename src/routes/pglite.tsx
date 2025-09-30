@@ -1,15 +1,18 @@
 import { PGlite } from "@electric-sql/pglite";
 import { live, type PGliteWithLive } from "@electric-sql/pglite/live";
 import { PGliteProvider } from "@electric-sql/pglite-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import PGLiteComponent from "./components/pglite-component";
-import { Button } from "./components/ui/button";
+import PGLiteComponent from "@/components/pglite-component";
 
 let dbGlobal: PGliteWithLive | undefined;
 
-function App() {
+export const Route = createFileRoute("/pglite")({
+	component: Index,
+});
+
+function Index() {
 	const [db, setDb] = useState<PGliteWithLive | undefined>();
-	const [count, setCount] = useState(0);
 
 	useEffect(() => {
 		async function setupDb() {
@@ -29,26 +32,16 @@ function App() {
 	}, []);
 
 	return (
-		<>
-			<h1 className="text-5xl">Vite + React + PGlite</h1>
-			<div className="flex flex-col gap-4 mt-8">
-				<div className="p-8 border rounded-md ">
-					<Button type="button" onClick={() => setCount((count) => count + 1)}>
-						Count is {count}
-					</Button>
-				</div>
-				<div className="p-8 border rounded-md">
-					{db ? (
-						<PGliteProvider db={db}>
-							<PGLiteComponent />
-						</PGliteProvider>
-					) : (
-						<div>Loading PGlite...</div>
-					)}
-				</div>
+		<div className="flex flex-col gap-4 mt-2">
+			<div className="p-8 border border-black rounded-md">
+				{db ? (
+					<PGliteProvider db={db}>
+						<PGLiteComponent />
+					</PGliteProvider>
+				) : (
+					<div>Loading PGlite...</div>
+				)}
 			</div>
-		</>
+		</div>
 	);
 }
-
-export default App;
