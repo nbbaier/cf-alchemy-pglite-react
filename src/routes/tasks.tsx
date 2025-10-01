@@ -5,16 +5,20 @@ import { DataTable } from "@/components/data-table";
 import { taskSchema } from "@/data/schema";
 import tasks from "@/data/tasks.json" with { type: "json" };
 
-export const Route = createFileRoute("/tasks")({
-	component: TaskPage,
-});
-
 async function getTasks() {
 	return z.array(taskSchema).parse(tasks);
 }
 
-export default async function TaskPage() {
-	const tasks = await getTasks();
+export const Route = createFileRoute("/tasks")({
+	loader: async () => {
+		const tasks = await getTasks();
+		return { tasks };
+	},
+	component: TaskPage,
+});
+
+function TaskPage() {
+	const { tasks } = Route.useLoaderData();
 
 	return (
 		<div className=" h-full flex-1 flex-col space-y-8 p-8 md:flex">

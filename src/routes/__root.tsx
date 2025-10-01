@@ -5,6 +5,7 @@ import {
 	useRouter,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import * as React from "react";
 import { Toaster } from "@/components/ui/sonner";
 
 const RootLayout = () => {
@@ -48,18 +49,13 @@ const RootLayout = () => {
 	return (
 		<div className="px-4 mx-auto max-w-6xl">
 			<div className="flex gap-2 px-4 py-4 border-b border-black">
-				{" "}
 				{navRoutes.map((route, index) => (
-					<>
+					<React.Fragment key={route.id}>
 						{index > 0 && "|"}
-						<Link
-							key={route.id}
-							to={route.path}
-							className="[&.active]:font-bold"
-						>
+						<Link to={route.path} className="[&.active]:font-bold">
 							{route.label}
 						</Link>
-					</>
+					</React.Fragment>
 				))}
 			</div>
 
