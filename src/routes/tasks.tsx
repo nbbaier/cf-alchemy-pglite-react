@@ -1,21 +1,14 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { columns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import { UserNav } from "@/components/user-nav";
 import { taskSchema } from "@/data/schema";
+import tasks from "@/data/tasks.json" with { type: "json" };
 
 export const Route = createFileRoute("/tasks")({
 	component: TaskPage,
 });
-
-function RouteComponent() {
-	return <div>Hello "/tasks"!</div>;
-}
-
-import tasks from "@/data/tasks.json" with { type: "json" };
 
 async function getTasks() {
 	return z.array(taskSchema).parse(tasks);
