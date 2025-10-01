@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { File, Upload, X } from "lucide-react";
+import { type File, Upload, X } from "lucide-react";
 import Papa from "papaparse";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -275,7 +275,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 					</div>
 				</label>
 
-				{files.length > 0 && (
+				{/* {files.length > 0 && (
 					<div className="space-y-2">
 						<p className="text-sm font-medium">
 							Selected files ({files.length})
@@ -311,7 +311,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 							))}
 						</div>
 					</div>
-				)}
+				)} */}
 			</div>
 		);
 	},

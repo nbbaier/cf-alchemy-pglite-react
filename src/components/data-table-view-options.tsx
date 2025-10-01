@@ -20,14 +20,13 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
 	table,
 }: DataTableViewOptionsProps<TData>) {
+	const allColumns = table.getAllColumns();
+	const hideableColumns = allColumns.filter((column) => column.getCanHide());
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button
-					variant="outline"
-					size="sm"
-					className="ml-auto hidden h-8 lg:flex"
-				>
+				<Button variant="outline" size="sm" className="mr-auto h-8 flex">
 					<Settings2 />
 					View
 				</Button>
@@ -35,26 +34,20 @@ export function DataTableViewOptions<TData>({
 			<DropdownMenuContent align="end" className="w-[150px]">
 				<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				{table
-					.getAllColumns()
-					.filter(
-						(column) =>
-							typeof column.accessorFn !== "undefined" && column.getCanHide(),
-					)
-					.map((column) => {
-						return (
-							<DropdownMenuCheckboxItem
-								key={column.id}
-								className="capitalize"
-								checked={column.getIsVisible()}
-								onCheckedChange={(value: boolean) =>
-									column.toggleVisibility(!!value)
-								}
-							>
-								{column.id}
-							</DropdownMenuCheckboxItem>
-						);
-					})}
+				{hideableColumns.map((column) => {
+					return (
+						<DropdownMenuCheckboxItem
+							key={column.id}
+							// className="capitalize"
+							checked={column.getIsVisible()}
+							onCheckedChange={(value: boolean) =>
+								column.toggleVisibility(!!value)
+							}
+						>
+							{column.id}
+						</DropdownMenuCheckboxItem>
+					);
+				})}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

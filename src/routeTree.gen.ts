@@ -10,14 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
+import { Route as TextareaRouteImport } from './routes/textarea'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as PgliteRouteImport } from './routes/pglite'
-import { Route as PgUploadRouteImport } from './routes/pg-upload'
 import { Route as IndexRouteImport } from './routes/index'
 
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TextareaRoute = TextareaRouteImport.update({
+  id: '/textarea',
+  path: '/textarea',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TasksRoute = TasksRouteImport.update({
@@ -30,11 +35,6 @@ const PgliteRoute = PgliteRouteImport.update({
   path: '/pglite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PgUploadRoute = PgUploadRouteImport.update({
-  id: '/pg-upload',
-  path: '/pg-upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,39 +43,39 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/pg-upload': typeof PgUploadRoute
   '/pglite': typeof PgliteRoute
   '/tasks': typeof TasksRoute
+  '/textarea': typeof TextareaRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/pg-upload': typeof PgUploadRoute
   '/pglite': typeof PgliteRoute
   '/tasks': typeof TasksRoute
+  '/textarea': typeof TextareaRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/pg-upload': typeof PgUploadRoute
   '/pglite': typeof PgliteRoute
   '/tasks': typeof TasksRoute
+  '/textarea': typeof TextareaRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/pg-upload' | '/pglite' | '/tasks' | '/upload'
+  fullPaths: '/' | '/pglite' | '/tasks' | '/textarea' | '/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/pg-upload' | '/pglite' | '/tasks' | '/upload'
-  id: '__root__' | '/' | '/pg-upload' | '/pglite' | '/tasks' | '/upload'
+  to: '/' | '/pglite' | '/tasks' | '/textarea' | '/upload'
+  id: '__root__' | '/' | '/pglite' | '/tasks' | '/textarea' | '/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PgUploadRoute: typeof PgUploadRoute
   PgliteRoute: typeof PgliteRoute
   TasksRoute: typeof TasksRoute
+  TextareaRoute: typeof TextareaRoute
   UploadRoute: typeof UploadRoute
 }
 
@@ -86,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/upload'
       fullPath: '/upload'
       preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/textarea': {
+      id: '/textarea'
+      path: '/textarea'
+      fullPath: '/textarea'
+      preLoaderRoute: typeof TextareaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tasks': {
@@ -102,13 +109,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PgliteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pg-upload': {
-      id: '/pg-upload'
-      path: '/pg-upload'
-      fullPath: '/pg-upload'
-      preLoaderRoute: typeof PgUploadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -121,9 +121,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PgUploadRoute: PgUploadRoute,
   PgliteRoute: PgliteRoute,
   TasksRoute: TasksRoute,
+  TextareaRoute: TextareaRoute,
   UploadRoute: UploadRoute,
 }
 export const routeTree = rootRouteImport

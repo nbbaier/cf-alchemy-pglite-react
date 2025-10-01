@@ -5,6 +5,7 @@ import {
 	useRouter,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Toaster } from "@/components/ui/sonner";
 
 const RootLayout = () => {
 	const router = useRouter();
@@ -45,7 +46,7 @@ const RootLayout = () => {
 		});
 
 	return (
-		<div className="px-4 mx-auto">
+		<div className="px-4 mx-auto max-w-6xl">
 			<div className="flex gap-2 px-4 py-4 border-b border-black">
 				{" "}
 				{navRoutes.map((route, index) => (
@@ -65,6 +66,7 @@ const RootLayout = () => {
 			<div className="p-4">
 				<Outlet />
 			</div>
+			<Toaster />
 			<TanStackRouterDevtools />
 		</div>
 	);

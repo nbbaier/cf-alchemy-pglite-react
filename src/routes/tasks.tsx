@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { columns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
-import { UserNav } from "@/components/user-nav";
 import { taskSchema } from "@/data/schema";
 import tasks from "@/data/tasks.json" with { type: "json" };
 
@@ -25,9 +24,6 @@ export default async function TaskPage() {
 					<p className="text-muted-foreground">
 						Here&apos;s a list of your tasks for this month!
 					</p>
-				</div>
-				<div className="flex items-center space-x-2">
-					<UserNav />
 				</div>
 			</div>
 			<DataTable data={tasks} columns={columns} />
