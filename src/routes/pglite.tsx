@@ -10,7 +10,7 @@ import { DataTable } from "@/components/data-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { createTableFromCSV } from "@/lib/database-utils";
+import { createTableFromCSV, sanitizeSqlIdentifier } from "@/lib/database-utils";
 
 const dbGlobal = await PGlite.create({
 	extensions: { live },
@@ -53,8 +53,10 @@ function UploadDemo() {
 
 	const handleTableClick = async (tableName: string) => {
 		try {
+			// Sanitize table name to prevent SQL injection
+			const sanitizedTableName = sanitizeSqlIdentifier(tableName);
 			const result = await db.query<Record<string, unknown>>(
-				`SELECT * FROM "${tableName}" LIMIT 100`,
+				`SELECT * FROM "${sanitizedTableName}" LIMIT 100`,
 			);
 			setCurrentTableName(tableName);
 			setUploadedData(result);
