@@ -23,6 +23,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { logger } from "@/lib/logger";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -66,7 +67,7 @@ export function DataTable<TData, TValue>({
 		globalFilterFn: "includesString",
 	});
 
-	console.log("[DataTable] Rendering", {
+	logger.debug("[DataTable] Rendering", {
 		columnCount: columns.length,
 		dataCount: data.length,
 		rowSelection,

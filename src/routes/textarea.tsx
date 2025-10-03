@@ -3,9 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import CodeMirror from "@uiw/react-codemirror";
 import { useState } from "react";
 
-// import { useState } from "react";
-// import { Textarea } from "@/components/ui/textarea";
-
 const CodeEditor = ({ content }: { content: string }) => {
 	const [value, setValue] = useState(content);
 
@@ -17,7 +14,6 @@ const CodeEditor = ({ content }: { content: string }) => {
 			value={value}
 			onChange={(value) => {
 				setValue(value);
-				console.log("value:", value);
 			}}
 		/>
 	);

@@ -1,5 +1,6 @@
 import type { PGlite } from "@electric-sql/pglite";
 import type { PGliteWithLive } from "@electric-sql/pglite/live";
+import { logger } from "./logger";
 
 type ColumnMetadata = {
 	originalName: string;
@@ -31,7 +32,7 @@ export async function createTableFromCSV(
 	columns: string[],
 	rows: string[][],
 ): Promise<TableMetadata> {
-	console.log("[databaseUtils] createTableFromCSV called", {
+	logger.debug("[databaseUtils] createTableFromCSV called", {
 		tableName,
 		columns,
 		rowCount: rows.length,
@@ -40,7 +41,7 @@ export async function createTableFromCSV(
 	const sanitizedTableName = sanitizeSqlIdentifier(tableName);
 	const sanitizedColumns = columns.map((col) => sanitizeSqlIdentifier(col));
 
-	console.log("[databaseUtils] Sanitized names", {
+	logger.debug("[databaseUtils] Sanitized names", {
 		sanitizedTableName,
 		sanitizedColumns,
 	});
@@ -52,50 +53,67 @@ export async function createTableFromCSV(
 		columnTypes.push(type);
 	}
 
-	console.log("[databaseUtils] Column types determined", columnTypes);
+	logger.debug("[databaseUtils] Column types determined", columnTypes);
 
 	const columnDefinitions = sanitizedColumns
 		.map((col, i) => `"${col}" ${columnTypes[i]}`)
 		.join(", ");
 
 	const dropTableSQL = `DROP TABLE IF EXISTS "${sanitizedTableName}" CASCADE`;
-	console.log("[databaseUtils] Dropping table if exists...");
+	logger.debug("[databaseUtils] Dropping table if exists...");
 	try {
 		await db.exec(dropTableSQL);
-		console.log("[databaseUtils] Table dropped");
+		logger.debug("[databaseUtils] Table dropped");
 	} catch (err) {
-		console.log("[databaseUtils] No table to drop or error:", err);
+		logger.debug("[databaseUtils] No table to drop or error:", err);
 	}
 
 	const createTableSQL = `CREATE TABLE IF NOT EXISTS "${sanitizedTableName}" (${columnDefinitions})`;
-	console.log("[databaseUtils] Creating table...", createTableSQL);
+	logger.debug("[databaseUtils] Creating table...", createTableSQL);
 	await db.exec(createTableSQL);
-	console.log("[databaseUtils] Table created");
+	logger.debug("[databaseUtils] Table created");
 
 	const placeholders = sanitizedColumns.map((_, i) => `$${i + 1}`).join(", ");
 	const insertSQL = `INSERT INTO "${sanitizedTableName}" (${sanitizedColumns.map((c) => `"${c}"`).join(", ")}) VALUES (${placeholders})`;
 
-	console.log("[databaseUtils] Inserting rows...", insertSQL);
-	for (const row of rows) {
-		const values = row.map((val, i) => {
-			if (val === "" || val === null || val === undefined) {
-				return null;
-			}
-			if (columnTypes[i] === "INTEGER" || columnTypes[i] === "REAL") {
-				const num = Number(val);
-				return Number.isNaN(num) ? null : num;
-			}
-			if (columnTypes[i] === "BOOLEAN") {
-				const trimmedVal = val.toString().trim().toLowerCase();
-				return ["true", "yes", "1", "t", "y"].includes(trimmedVal);
-			}
-			return val.toString();
-		});
+	logger.debug("[databaseUtils] Inserting rows...", insertSQL);
 
-		console.log("[databaseUtils] Inserting row with values:", values);
-		await db.query(insertSQL, values);
+	await db.exec("BEGIN");
+	try {
+		const BATCH_SIZE = 500;
+		for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+			const batch = rows.slice(i, i + BATCH_SIZE);
+			logger.debug(
+				`[databaseUtils] Processing batch ${Math.floor(i / BATCH_SIZE) + 1} of ${Math.ceil(rows.length / BATCH_SIZE)}`,
+			);
+
+			for (const row of batch) {
+				const values = row.map((val, i) => {
+					if (val === "" || val === null || val === undefined) {
+						return null;
+					}
+					if (columnTypes[i] === "INTEGER" || columnTypes[i] === "REAL") {
+						const num = Number(val);
+						return Number.isNaN(num) ? null : num;
+					}
+					if (columnTypes[i] === "BOOLEAN") {
+						const trimmedVal = val.toString().trim().toLowerCase();
+						return ["true", "yes", "1", "t", "y"].includes(trimmedVal);
+					}
+					return val.toString();
+				});
+
+				await db.query(insertSQL, values);
+			}
+		}
+
+		await db.exec("COMMIT");
+		logger.debug("[databaseUtils] All rows inserted successfully");
+	} catch (err) {
+		await db.exec("ROLLBACK");
+		logger.error("[databaseUtils] Transaction failed, rolling back:", err);
+		throw err;
 	}
-	console.log("[databaseUtils] All rows inserted");
 
 	return {
 		tableName,

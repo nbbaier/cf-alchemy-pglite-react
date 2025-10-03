@@ -10,7 +10,11 @@ import { DataTable } from "@/components/data-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { createTableFromCSV, sanitizeSqlIdentifier } from "@/lib/database-utils";
+import {
+	createTableFromCSV,
+	sanitizeSqlIdentifier,
+} from "@/lib/database-utils";
+import { logger } from "@/lib/logger";
 
 const dbGlobal = await PGlite.create({
 	extensions: { live },
@@ -44,7 +48,7 @@ function UploadDemo() {
 				);
 				setTableList(tableNames.rows);
 			} catch (err) {
-				console.error("[App] Error loading tables:", err);
+				logger.error("[App] Error loading tables:", err);
 			}
 		};
 
@@ -53,7 +57,6 @@ function UploadDemo() {
 
 	const handleTableClick = async (tableName: string) => {
 		try {
-			// Sanitize table name to prevent SQL injection
 			const sanitizedTableName = sanitizeSqlIdentifier(tableName);
 			const result = await db.query<Record<string, unknown>>(
 				`SELECT * FROM "${sanitizedTableName}" LIMIT 100`,
@@ -62,7 +65,7 @@ function UploadDemo() {
 			setUploadedData(result);
 			toast.success(`Loaded data from table "${tableName}"`);
 		} catch (err) {
-			console.error("[App] Error loading table:", err);
+			logger.error("[App] Error loading table:", err);
 			toast.error(
 				err instanceof Error ? err.message : "Failed to load table data",
 			);
@@ -70,7 +73,7 @@ function UploadDemo() {
 	};
 
 	const handleFileProcessed = async (data: CSVData) => {
-		console.log("[PGUpload] handleFileProcessed called with:", {
+		logger.debug("[PGUpload] handleFileProcessed called with:", {
 			tableName: data.tableName,
 			columns: data.columns,
 			rowCount: data.rows.length,
@@ -80,7 +83,7 @@ function UploadDemo() {
 		const toastId = toast.loading("Creating table and importing data...");
 
 		try {
-			console.log("[App] Calling createTableFromCSV...");
+			logger.debug("[App] Calling createTableFromCSV...");
 
 			const metadata = await createTableFromCSV(
 				db,
@@ -89,7 +92,7 @@ function UploadDemo() {
 				data.rows,
 			);
 
-			console.log("[App] Table created successfully with metadata:", metadata);
+			logger.debug("[App] Table created successfully with metadata:", metadata);
 
 			const result = await db.query<Record<string, unknown>>(
 				`SELECT * FROM "${metadata.sanitizedTableName}" LIMIT 100`,
@@ -107,9 +110,9 @@ function UploadDemo() {
 				{ id: toastId }, // This replaces the loading toast
 			);
 
-			console.log("[App] Upload complete!");
+			logger.debug("[App] Upload complete!");
 		} catch (err) {
-			console.error("[App] Error during upload:", err);
+			logger.error("[App] Error during upload:", err);
 
 			// Dismiss loading toast and show error
 			toast.error(
@@ -129,6 +132,8 @@ function UploadDemo() {
 						maxSize={5 * 1024 * 1024}
 						multiple={true}
 					/>
+
+					<hr />
 
 					{tableList.length > 0 && (
 						<div className="flex flex-wrap gap-2">
@@ -151,6 +156,7 @@ function UploadDemo() {
 					)}
 
 					<hr />
+
 					{uploadedData && <PGLiteResultsTable data={uploadedData} />}
 				</div>
 			</div>
@@ -160,7 +166,7 @@ function UploadDemo() {
 
 function PGLiteResultsTable({ data }: { data: Results }) {
 	const tableData = useMemo<TableRow[]>(() => {
-		console.log("[PGLiteResultsTable] Processing data:", {
+		logger.debug("[PGLiteResultsTable] Processing data:", {
 			rowCount: data.rows.length,
 			fieldCount: data.fields.length,
 			fields: data.fields.map((f) => f.name),
@@ -187,7 +193,7 @@ function PGLiteResultsTable({ data }: { data: Results }) {
 			return rowObject;
 		});
 
-		console.log("[PGLiteResultsTable] Processed table data:", processed);
+		logger.debug("[PGLiteResultsTable] Processed table data:", processed);
 		return processed;
 	}, [data.fields, data.rows]);
 

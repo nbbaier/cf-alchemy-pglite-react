@@ -5,6 +5,7 @@ import { CSVUpload } from "@/components/csv-upload";
 import { DataTable } from "@/components/data-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 
 export const Route = createFileRoute("/upload")({
 	component: UploadDemo,
@@ -27,7 +28,7 @@ function UploadDemo() {
 		columns: string[];
 		rows: string[][];
 	}) => {
-		console.log("File processed", data);
+		logger.debug("File processed", data);
 		setProcessedData((prev) => {
 			const newData = [...prev, data];
 			setSelectedTableIndex(newData.length - 1);

@@ -2,6 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Upload } from "lucide-react";
 import Papa from "papaparse";
 import * as React from "react";
+import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 const csvUploadVariants = cva(
@@ -59,7 +60,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 		const [files, setFiles] = React.useState<File[]>([]);
 		const inputId = React.useId();
 		const [isProcessing, setIsProcessing] = React.useState(false);
-		const [_error, setError] = React.useState<string | null>(null);
+		const [error, setError] = React.useState<string | null>(null);
 
 		const isValidCSV = (file: File): boolean => {
 			const fileName = file.name.toLowerCase();
@@ -99,11 +100,11 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 
 		const validateFile = (file: File): boolean => {
 			if (!isValidCSV(file)) {
-				console.warn(`File ${file.name} is not a valid CSV file`);
+				logger.warn(`File ${file.name} is not a valid CSV file`);
 				return false;
 			}
 			if (maxSize && file.size > maxSize) {
-				console.warn(`File ${file.name} exceeds max size of ${maxSize} bytes`);
+				logger.warn(`File ${file.name} exceeds max size of ${maxSize} bytes`);
 				return false;
 			}
 			return true;
@@ -133,10 +134,10 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 		};
 
 		const processFile = (file: File) => {
-			console.log("[CSVUpload] Processing file:", file.name);
+			logger.debug("[CSVUpload] Processing file:", file.name);
 
 			setIsProcessing(true);
-			setError(null);
+			setError(null); // Clear any previous errors
 
 			const MAX_ROWS = 10000;
 			const MAX_COLUMNS = 100;
@@ -145,7 +146,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 			Papa.parse(file, {
 				complete: (results) => {
 					try {
-						console.log("[CSVUpload] Parse complete:", results);
+						logger.debug("[CSVUpload] Parse complete:", results);
 
 						if (!results.data || results.data.length === 0) {
 							throw new Error("CSV file is empty");
@@ -179,8 +180,8 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 							}
 						}
 
-						console.log("[CSVUpload] Headers:", headers);
-						console.log("[CSVUpload] Data rows count:", dataRows.length);
+						logger.debug("[CSVUpload] Headers:", headers);
+						logger.debug("[CSVUpload] Data rows count:", dataRows.length);
 
 						if (!headers || headers.length === 0) {
 							throw new Error("CSV file has no headers");
@@ -191,7 +192,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 							.replace(/[^a-zA-Z0-9_]/g, "_")
 							.toLowerCase();
 
-						console.log(
+						logger.debug(
 							"[CSVUpload] Calling onFileProcessed with table:",
 							tableName,
 						);
@@ -204,7 +205,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 
 						setIsProcessing(false);
 					} catch (err) {
-						console.error("[CSVUpload] Error processing CSV:", err);
+						logger.error("[CSVUpload] Error processing CSV:", err);
 						setError(
 							err instanceof Error ? err.message : "Failed to process CSV file",
 						);
@@ -212,7 +213,7 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 					}
 				},
 				error: (err) => {
-					console.error("[CSVUpload] Parse error:", err);
+					logger.error("[CSVUpload] Parse error:", err);
 					setError(err.message);
 					setIsProcessing(false);
 				},
@@ -233,6 +234,12 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 
 		return (
 			<div className="w-full space-y-4 group">
+				{error && (
+					<div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
+						<p className="text-sm text-destructive font-medium">{error}</p>
+					</div>
+				)}
+
 				<label
 					ref={ref}
 					htmlFor={inputId}
