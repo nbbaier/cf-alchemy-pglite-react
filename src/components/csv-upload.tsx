@@ -6,7 +6,7 @@ import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
 
 const csvUploadVariants = cva(
-	"relative flex flex-col items-center justify-center w-full rounded-lg border-2 border-dashed transition-colors",
+	"relative flex flex-col items-center justify-center w-full rounded-md border-2 border-dashed transition-colors",
 	{
 		variants: {
 			variant: {

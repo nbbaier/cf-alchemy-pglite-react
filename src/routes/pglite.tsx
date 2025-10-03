@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { CSVUpload } from "@/components/csv-upload";
 import { DataTable } from "@/components/data-table";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import { CodeEditor } from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -22,7 +23,7 @@ const dbGlobal = await PGlite.create({
 });
 
 export const Route = createFileRoute("/pglite")({
-	component: UploadDemo,
+	component: RouteComponent,
 });
 
 type TableRow = Record<string, string | number | boolean | null>;
@@ -33,12 +34,13 @@ type CSVData = {
 	rows: string[][];
 };
 
-function UploadDemo() {
+function RouteComponent() {
 	const db = usePGlite(dbGlobal);
 	const [uploadedData, setUploadedData] = useState<Results | null>(null);
 	const [currentTableName, setCurrentTableName] = useState<string | null>(null);
 	// const [isCreatingTable, setIsCreatingTable] = useState(false);
 	const [tableList, setTableList] = useState<{ table_name: string }[]>([]);
+	const [editorContent, setEditorContent] = useState<string>("");
 
 	useEffect(() => {
 		const loadTables = async () => {
@@ -58,9 +60,9 @@ function UploadDemo() {
 	const handleTableClick = async (tableName: string) => {
 		try {
 			const sanitizedTableName = sanitizeSqlIdentifier(tableName);
-			const result = await db.query<Record<string, unknown>>(
-				`SELECT * FROM "${sanitizedTableName}" LIMIT 100`,
-			);
+			const sql = `SELECT * FROM "${sanitizedTableName}" LIMIT 100`;
+			setEditorContent(sql);
+			const result = await db.query<Record<string, unknown>>(sql);
 			setCurrentTableName(tableName);
 			setUploadedData(result);
 			toast.success(`Loaded data from table "${tableName}"`);
@@ -122,6 +124,21 @@ function UploadDemo() {
 		}
 	};
 
+	const handleRunQuery = async (query: string) => {
+		try {
+			console.log(query);
+			const result = await db.query<Record<string, unknown>>(query);
+			setUploadedData(result);
+			setCurrentTableName(null);
+			toast.success("Query executed successfully");
+		} catch (err) {
+			logger.error("[App] Error executing query:", err);
+			toast.error(
+				err instanceof Error ? err.message : "Failed to execute query",
+			);
+		}
+	};
+
 	return (
 		<PGliteProvider db={db}>
 			<div className="container mx-auto p-8">
@@ -132,9 +149,9 @@ function UploadDemo() {
 						maxSize={5 * 1024 * 1024}
 						multiple={true}
 					/>
-
 					<hr />
-
+					<CodeEditor content={editorContent} onRunQuery={handleRunQuery} />
+					<hr />
 					{tableList.length > 0 && (
 						<div className="flex flex-wrap gap-2">
 							{tableList.map((table) => (
@@ -154,9 +171,7 @@ function UploadDemo() {
 							))}
 						</div>
 					)}
-
 					<hr />
-
 					{uploadedData && <PGLiteResultsTable data={uploadedData} />}
 				</div>
 			</div>

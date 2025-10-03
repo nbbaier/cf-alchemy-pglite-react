@@ -8,124 +8,106 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as UploadRouteImport } from "./routes/upload";
-import { Route as TextareaRouteImport } from "./routes/textarea";
-import { Route as TasksRouteImport } from "./routes/tasks";
-import { Route as PgliteRouteImport } from "./routes/pglite";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadRouteImport } from './routes/upload'
+import { Route as ResizeRouteImport } from './routes/resize'
+import { Route as PgliteRouteImport } from './routes/pglite'
+import { Route as IndexRouteImport } from './routes/index'
 
 const UploadRoute = UploadRouteImport.update({
-	id: "/upload",
-	path: "/upload",
-	getParentRoute: () => rootRouteImport,
-} as any);
-const TextareaRoute = TextareaRouteImport.update({
-	id: "/textarea",
-	path: "/textarea",
-	getParentRoute: () => rootRouteImport,
-} as any);
-const TasksRoute = TasksRouteImport.update({
-	id: "/tasks",
-	path: "/tasks",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResizeRoute = ResizeRouteImport.update({
+  id: '/resize',
+  path: '/resize',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PgliteRoute = PgliteRouteImport.update({
-	id: "/pglite",
-	path: "/pglite",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/pglite',
+  path: '/pglite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
-	id: "/",
-	path: "/",
-	getParentRoute: () => rootRouteImport,
-} as any);
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-	"/": typeof IndexRoute;
-	"/pglite": typeof PgliteRoute;
-	"/tasks": typeof TasksRoute;
-	"/textarea": typeof TextareaRoute;
-	"/upload": typeof UploadRoute;
+  '/': typeof IndexRoute
+  '/pglite': typeof PgliteRoute
+  '/resize': typeof ResizeRoute
+  '/upload': typeof UploadRoute
 }
 export interface FileRoutesByTo {
-	"/": typeof IndexRoute;
-	"/pglite": typeof PgliteRoute;
-	"/tasks": typeof TasksRoute;
-	"/textarea": typeof TextareaRoute;
-	"/upload": typeof UploadRoute;
+  '/': typeof IndexRoute
+  '/pglite': typeof PgliteRoute
+  '/resize': typeof ResizeRoute
+  '/upload': typeof UploadRoute
 }
 export interface FileRoutesById {
-	__root__: typeof rootRouteImport;
-	"/": typeof IndexRoute;
-	"/pglite": typeof PgliteRoute;
-	"/tasks": typeof TasksRoute;
-	"/textarea": typeof TextareaRoute;
-	"/upload": typeof UploadRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/pglite': typeof PgliteRoute
+  '/resize': typeof ResizeRoute
+  '/upload': typeof UploadRoute
 }
 export interface FileRouteTypes {
-	fileRoutesByFullPath: FileRoutesByFullPath;
-	fullPaths: "/" | "/pglite" | "/tasks" | "/textarea" | "/upload";
-	fileRoutesByTo: FileRoutesByTo;
-	to: "/" | "/pglite" | "/tasks" | "/textarea" | "/upload";
-	id: "__root__" | "/" | "/pglite" | "/tasks" | "/textarea" | "/upload";
-	fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/pglite' | '/resize' | '/upload'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/pglite' | '/resize' | '/upload'
+  id: '__root__' | '/' | '/pglite' | '/resize' | '/upload'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-	IndexRoute: typeof IndexRoute;
-	PgliteRoute: typeof PgliteRoute;
-	TasksRoute: typeof TasksRoute;
-	TextareaRoute: typeof TextareaRoute;
-	UploadRoute: typeof UploadRoute;
+  IndexRoute: typeof IndexRoute
+  PgliteRoute: typeof PgliteRoute
+  ResizeRoute: typeof ResizeRoute
+  UploadRoute: typeof UploadRoute
 }
 
-declare module "@tanstack/react-router" {
-	interface FileRoutesByPath {
-		"/upload": {
-			id: "/upload";
-			path: "/upload";
-			fullPath: "/upload";
-			preLoaderRoute: typeof UploadRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/textarea": {
-			id: "/textarea";
-			path: "/textarea";
-			fullPath: "/textarea";
-			preLoaderRoute: typeof TextareaRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/tasks": {
-			id: "/tasks";
-			path: "/tasks";
-			fullPath: "/tasks";
-			preLoaderRoute: typeof TasksRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/pglite": {
-			id: "/pglite";
-			path: "/pglite";
-			fullPath: "/pglite";
-			preLoaderRoute: typeof PgliteRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-		"/": {
-			id: "/";
-			path: "/";
-			fullPath: "/";
-			preLoaderRoute: typeof IndexRouteImport;
-			parentRoute: typeof rootRouteImport;
-		};
-	}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resize': {
+      id: '/resize'
+      path: '/resize'
+      fullPath: '/resize'
+      preLoaderRoute: typeof ResizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pglite': {
+      id: '/pglite'
+      path: '/pglite'
+      fullPath: '/pglite'
+      preLoaderRoute: typeof PgliteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-	IndexRoute: IndexRoute,
-	PgliteRoute: PgliteRoute,
-	TasksRoute: TasksRoute,
-	TextareaRoute: TextareaRoute,
-	UploadRoute: UploadRoute,
-};
+  IndexRoute: IndexRoute,
+  PgliteRoute: PgliteRoute,
+  ResizeRoute: ResizeRoute,
+  UploadRoute: UploadRoute,
+}
 export const routeTree = rootRouteImport
-	._addFileChildren(rootRouteChildren)
-	._addFileTypes<FileRouteTypes>();
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
