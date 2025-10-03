@@ -71,8 +71,6 @@ Papa.parse(file, {
 
       const rows = results.data as string[][];
       const headers = rows[0];
-
-      // ADD VALIDATION HERE
       if (headers.length > MAX_COLUMNS) {
         throw new Error(`Too many columns. Maximum ${MAX_COLUMNS} allowed.`);
       }

@@ -117,18 +117,19 @@ function determineColumnType(columnValues: string[]): PostgresColumnType {
 		return "TEXT";
 	}
 
-	const types = nonEmptyValues.slice(0, 100).map(inferDataType);
+	const sampleSize = Math.min(100, nonEmptyValues.length);
 	const typeCounts: Partial<Record<PostgresColumnType, number>> = {};
 
-	for (const type of types) {
+	for (let i = 0; i < sampleSize; i++) {
+		const type = inferDataType(nonEmptyValues[i]);
 		typeCounts[type] = (typeCounts[type] ?? 0) + 1;
+
+		if (typeCounts.TEXT && typeCounts.TEXT > sampleSize * 0.1) {
+			return "TEXT";
+		}
 	}
 
-	if (typeCounts.TEXT && typeCounts.TEXT > types.length * 0.1) {
-		return "TEXT";
-	}
-
-	if (typeCounts.BOOLEAN && typeCounts.BOOLEAN === types.length) {
+	if (typeCounts.BOOLEAN && typeCounts.BOOLEAN === sampleSize) {
 		return "BOOLEAN";
 	}
 
