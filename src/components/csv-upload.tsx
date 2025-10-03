@@ -138,19 +138,46 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 			setIsProcessing(true);
 			setError(null);
 
+			const MAX_ROWS = 10000;
+			const MAX_COLUMNS = 100;
+			const MAX_CELL_SIZE = 10000; // characters
+
 			Papa.parse(file, {
 				complete: (results) => {
 					try {
 						console.log("[CSVUpload] Parse complete:", results);
+
 						if (!results.data || results.data.length === 0) {
 							throw new Error("CSV file is empty");
 						}
 
 						const rows = results.data as string[][];
 						const headers = rows[0];
+
+						if (headers.length > MAX_COLUMNS) {
+							throw new Error(
+								`Too many columns. Maximum ${MAX_COLUMNS} allowed.`,
+							);
+						}
+
 						const dataRows = rows
 							.slice(1)
 							.filter((row) => row.some((cell) => cell !== ""));
+
+						if (dataRows.length > MAX_ROWS) {
+							throw new Error(`Too many rows. Maximum ${MAX_ROWS} allowed.`);
+						}
+
+						// Validate cell sizes
+						for (const row of dataRows) {
+							for (const cell of row) {
+								if (cell.length > MAX_CELL_SIZE) {
+									throw new Error(
+										`Cell too large. Maximum ${MAX_CELL_SIZE} characters allowed.`,
+									);
+								}
+							}
+						}
 
 						console.log("[CSVUpload] Headers:", headers);
 						console.log("[CSVUpload] Data rows count:", dataRows.length);

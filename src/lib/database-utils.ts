@@ -16,13 +16,6 @@ type TableMetadata = {
 
 type PostgresColumnType = "TEXT" | "INTEGER" | "REAL" | "DATE" | "BOOLEAN";
 
-/**
- * Sanitizes SQL identifiers (table and column names) to prevent SQL injection.
- * - Only allows alphanumeric characters and underscores
- * - Ensures identifier starts with a letter or underscore (PostgreSQL requirement)
- * - Converts to lowercase for consistency
- * - Adds underscore prefix if identifier starts with a number
- */
 export function sanitizeSqlIdentifier(identifier: string): string {
 	// Only allow alphanumeric and underscore, must start with letter or underscore
 	const sanitized = identifier.replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
