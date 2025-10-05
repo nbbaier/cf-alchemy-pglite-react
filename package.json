@@ -50,6 +50,7 @@
 		"@cloudflare/vite-plugin": "^1.7.4",
 		"@cloudflare/workers-types": "^4.20250805.0",
 		"@tanstack/router-plugin": "^1.132.26",
+		"@types/bun": "^1.2.23",
 		"@types/node": "^24.6.0",
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",

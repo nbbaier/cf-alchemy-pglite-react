@@ -1,6 +1,6 @@
 User ID,Name,Email,Age,Country,Enrolled
-1,John Doe,john.doe@example.com,30,USA,True
-2,Jane Smith,jane.smith@example.com,25,Canada,False
-3,Bob Johnson,bob.johnson@example.com,35,UK,True      
-4,Alice Williams,alice.williams@example.com,28,Australia,True
-5,Michael Brown,michael.brown@example.com,40,USA,False
+1,John Doe,john.doe@example.com,30,USA,false
+2,Jane Smith,jane.smith@example.com,25,Canada,false
+3,Bob Johnson,bob.johnson@example.com,35,UK,true
+4,Alice Williams,alice.williams@example.com,28,Australia,false
+5,Michael Brown,michael.brown@example.com,40,USA,true

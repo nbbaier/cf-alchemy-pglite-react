@@ -38,7 +38,6 @@ function RouteComponent() {
 	const db = usePGlite(dbGlobal);
 	const [uploadedData, setUploadedData] = useState<Results | null>(null);
 	const [currentTableName, setCurrentTableName] = useState<string | null>(null);
-	// const [isCreatingTable, setIsCreatingTable] = useState(false);
 	const [tableList, setTableList] = useState<{ table_name: string }[]>([]);
 	const [editorContent, setEditorContent] = useState<string>("");
 

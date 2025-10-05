@@ -10,18 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
-import { Route as ResizeRouteImport } from './routes/resize'
 import { Route as PgliteRouteImport } from './routes/pglite'
 import { Route as IndexRouteImport } from './routes/index'
 
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResizeRoute = ResizeRouteImport.update({
-  id: '/resize',
-  path: '/resize',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PgliteRoute = PgliteRouteImport.update({
@@ -38,34 +32,30 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/pglite': typeof PgliteRoute
-  '/resize': typeof ResizeRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/pglite': typeof PgliteRoute
-  '/resize': typeof ResizeRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/pglite': typeof PgliteRoute
-  '/resize': typeof ResizeRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/pglite' | '/resize' | '/upload'
+  fullPaths: '/' | '/pglite' | '/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/pglite' | '/resize' | '/upload'
-  id: '__root__' | '/' | '/pglite' | '/resize' | '/upload'
+  to: '/' | '/pglite' | '/upload'
+  id: '__root__' | '/' | '/pglite' | '/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PgliteRoute: typeof PgliteRoute
-  ResizeRoute: typeof ResizeRoute
   UploadRoute: typeof UploadRoute
 }
 
@@ -76,13 +66,6 @@ declare module '@tanstack/react-router' {
       path: '/upload'
       fullPath: '/upload'
       preLoaderRoute: typeof UploadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/resize': {
-      id: '/resize'
-      path: '/resize'
-      fullPath: '/resize'
-      preLoaderRoute: typeof ResizeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pglite': {
@@ -105,7 +88,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PgliteRoute: PgliteRoute,
-  ResizeRoute: ResizeRoute,
   UploadRoute: UploadRoute,
 }
 export const routeTree = rootRouteImport

@@ -144,10 +144,14 @@ const CSVUpload = React.forwardRef<HTMLLabelElement, CSVUploadProps>(
 			const MAX_CELL_SIZE = 10000; // characters
 
 			Papa.parse(file, {
+				dynamicTyping: true,
+				skipEmptyLines: true,
+				header: true,
 				complete: (results) => {
 					try {
 						logger.debug("[CSVUpload] Parse complete:", results);
 
+						console.log(results);
 						if (!results.data || results.data.length === 0) {
 							throw new Error("CSV file is empty");
 						}
