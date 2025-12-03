@@ -185,7 +185,7 @@ The `MatchRouteOptions` type is used to describe the options that can be used wh
 ```tsx
 interface MatchRouteOptions {
   pending?: boolean
-  caseSensitive?: boolean
+  caseSensitive?: boolean /* @deprecated */
   includeSearch?: boolean
   fuzzy?: boolean
 }
@@ -201,11 +201,12 @@ The `MatchRouteOptions` type has the following properties:
 - Optional
 - If `true`, will match against pending location instead of the current location
 
-### `caseSensitive` property
+### ~~`caseSensitive`~~ property (deprecated)
 
 - Type: `boolean`
 - Optional
 - If `true`, will match against the current location with case sensitivity
+- Declare case sensitivity in the route definition instead, or globally for all routes using the `caseSensitive` option on the router
 
 ### `includeSearch` property
 
@@ -268,7 +269,7 @@ The `NavigateOptions` object accepts the following properties:
 - Optional
 - Defaults to `false`.
 - If `true`, navigation will be called using `document.startViewTransition()`.
-- If [`ViewTransitionOptions`](../ViewTransitionOptionsType.md), route navigations will be called using `document.startViewTransition({update, types})` where `types` will be the strings array passed with `ViewTransitionOptions["types"]`. If the browser does not support viewTransition types, the navigation will fall back to normal `document.startTransition()`, same as if `true` was passed.
+- If [`ViewTransitionOptions`](../ViewTransitionOptionsType.md), route navigations will be called using `document.startViewTransition({update, types})` where `types` will determine the strings array passed with `ViewTransitionOptions["types"]`. If the browser does not support viewTransition types, the navigation will fall back to normal `document.startTransition()`, same as if `true` was passed.
 - If the browser does not support this api, this option will be ignored.
 - See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Document/startViewTransition) for more information on how this function works.
 - See [Google](https://developer.chrome.com/docs/web-platform/view-transitions/same-document#view-transition-types) for more information on viewTransition types
@@ -2008,7 +2009,15 @@ The `ViewTransitionOptions` type is used to define a
 
 ```tsx
 interface ViewTransitionOptions {
-  types: Array<string>
+  types:
+    | Array<string>
+    | ((locationChangeInfo: {
+        fromLocation?: ParsedLocation
+        toLocation: ParsedLocation
+        pathChanged: boolean
+        hrefChanged: boolean
+        hashChanged: boolean
+      }) => Array<string> | false)
 }
 ```
 
@@ -2018,9 +2027,19 @@ The `ViewTransitionOptions` type accepts an object with a single property:
 
 ### `types` property
 
-- Type: `Array<string>`
+- Type: `Array<string> | ((locationChangeInfo: {
+  fromLocation?: ParsedLocation
+  toLocation: ParsedLocation
+  pathChanged: boolean
+  hrefChanged: boolean
+  hashChanged: boolean
+}) => (Array<string> | false))`
 - Required
-- The types array that will be passed to the `document.startViewTransition({update, types}) call`;
+- Either one of:
+  - An array of strings that will be passed to the `document.startViewTransition({update, types}) call`
+  - A function that accepts `locationChangeInfo` object and returns either:
+    - An array of strings that will be passed to the `document.startViewTransition({update, types}) call`
+    - or `false` to skip the view transition
 
 # Await component
 
@@ -2939,6 +2958,40 @@ The `Navigate` component accepts the following props:
 ## Navigate returns
 
 - `null`
+
+# NotFoundComponent component
+
+The `NotFoundComponent` component is a component that renders when a not-found error occurs in a route.
+
+## NotFoundComponent props
+
+The `NotFoundComponent` component accepts the following props:
+
+### `props.data` prop
+
+- Type: `unknown`
+- Optional
+- Custom data that is passed to the `notFoundComponent` when the not-found error is handled
+- This data comes from the `data` property of the `NotFoundError` object
+
+### `props.isNotFound` prop
+
+- Type: `boolean`
+- Required
+- A boolean value indicating whether the current state is a not-found error state
+- This value is always `true`
+
+### `props.routeId` prop
+
+- Type: `RouteIds<RegisteredRouter['routeTree']>`
+- Required
+- The ID of the route that is attempting to handle the not-found error
+- Must be one of the valid route IDs from the router's route tree
+
+## NotFoundComponent returns
+
+- Returns appropriate UI for not-found error situations
+- Typically includes a "page not found" message along with links to go home or navigate to previous pages
 
 # notFound function
 

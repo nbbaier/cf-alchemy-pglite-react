@@ -520,7 +520,7 @@ If you are not able to use the automatic code-splitting feature, you can still c
 > [!IMPORTANT]
 > The `__root.tsx` route file, using either `createRootRoute` or `createRootRouteWithContext`, does not support code splitting, since it's always rendered regardless of the current route.
 
-These are the only options that `createLazyFileRoute` support:
+These are the only options that `createLazyFileRoute` supports:
 
 | Export Name         | Description                                                           |
 | ------------------- | --------------------------------------------------------------------- |
@@ -3060,6 +3060,11 @@ By default, all links are absolute unless a `from` route path is provided. This 
 
 Relative links can be combined with a `from` route path. If a from route path isn't provided, relative paths default to the current active location.
 
+> [!NOTE]
+> Keep in mind that when calling useNavigate as a method on the route, for example `Route.useNavigate`, then the `from` location is predefined to be the route it's called on.
+>
+> Another common pitfall is when using this in a pathless layout route, since the pathless layout route does not have an actual path, the `from` location is regarded as the parent of the pathless layout route. Hence relative routing will be resolved from this parent.
+
 ```tsx
 const postIdRoute = createRoute({
   path: '/blog/post/$postId',
@@ -3831,6 +3836,8 @@ The not-found error above will be handled by the same route or nearest parent ro
 
 If neither the route nor any suitable parent route is found to handle the error, the root route will handle it using TanStack Router's **extremely basic (and purposefully undesirable)** default not-found component that simply renders `<div>Not Found</div>`. It's highly recommended to either attach at least one `notFoundComponent` to the root route or configure a router-wide `defaultNotFoundComponent` to handle not-found errors.
 
+> ⚠️ Throwing a notFound error in a beforeLoad method will always trigger the __root notFoundComponent. Since beforeLoad methods are run prior to the route loader methods, there is no guarantee that any required data for layouts have successfully loaded before the error is thrown.
+
 ## Specifying Which Routes Handle Not Found Errors
 
 Sometimes you may want to trigger a not-found on a specific parent route and bypass the normal not-found component propagation. To do this, pass in a route id to the `route` option in the `notFound` function.
@@ -4186,14 +4193,14 @@ function FileComponent() {
 You can combine both prefixes and suffixes to create very specific routing patterns. For example, if you want to match a URL that starts with `user-` and ends with `.json`, you can define it like this:
 
 ```tsx
-// src/routes/users/user-{$userId}person
-export const Route = createFileRoute('/users/user-{$userId}person')({
+// src/routes/users/user-{$userId}.json
+export const Route = createFileRoute('/users/user-{$userId}.json')({
   component: UserComponent,
 })
 
 function UserComponent() {
   const { userId } = Route.useParams()
-  // userId will be the value between 'user-' and 'person'
+  // userId will be the value between 'user-' and '.json'
   return <div>User ID: {userId}</div>
 }
 ```
@@ -5180,6 +5187,9 @@ const router = createRouter({
   routeTree,
 })
 ```
+
+> [!TIP]
+> `MyRouterContext` only needs to contain content that will be passed directly to `createRouter` below. All other context added in `beforeLoad` will be inferred.
 
 ## Passing the initial Router Context
 
@@ -6430,9 +6440,9 @@ declare module '@tanstack/react-router' {
 
 ### Rendering the Application on the Server
 
-Now that you have a router instance that has loaded all of the critical data for the current URL, you can render your application on the server:
+Now that you have a router instance that has loaded all the critical data for the current URL, you can render your application on the server:
 
-using `defaultRenderToString`
+using `defaultRenderHandler`
 
 ```tsx
 // src/entry-server.tsx
@@ -6445,7 +6455,7 @@ import { createRouter } from './router'
 export async function render({ request }: { request: Request }) {
   const handler = createRequestHandler({ request, createRouter })
 
-  return await handler(defaultRenderToString)
+  return await handler(defaultRenderHandler)
 }
 ```
 
@@ -6504,7 +6514,7 @@ With this setup, your application will be rendered on the server and then hydrat
 
 ## Streaming SSR
 
-Streaming SSR is the most modern flavor of SSR and is the process of continuously and incrementally sending HTML markup to the client as it is rendered on the server. This is slightly different from traditional SSR in concept because beyond being able to dehydrate and rehydrate a critical first paint, markup and data with less priority or slower response times can be streamed to the client after the initial render, but in the same request.
+Streaming SSR is the most modern flavor of SSR and is the process of continuously and incrementally sending HTML markup to the client as it is rendered on the server. This is slightly different from traditional SSR in concept because beyond being able to dehydrate and rehydrate a critical first paint, markup and data with lower priority or slower response times can be streamed to the client after the initial render, but in the same request.
 
 This pattern can be useful for pages that have slow or high-latency data fetching requirements. For example, if you have a page that needs to fetch data from a third-party API, you can stream the critical initial markup and data to the client and then stream the less-critical third-party data to the client as it is resolved.
 
@@ -6678,7 +6688,7 @@ const parentRoute = createRoute({
 
 ## Exported Hooks, Components, and Utilities
 
-For the types of your router to work with top-level exports like `Link`, `useNavigate`, `useParams`, etc. they must permeate the type-script module boundary and be registered right into the library. To do this, we use declaration merging on the exported `Register` interface.
+For the types of your router to work with top-level exports like `Link`, `useNavigate`, `useParams`, etc. they must permeate the TypeScript module boundary and be registered right into the library. To do this, we use declaration merging on the exported `Register` interface.
 
 ```ts
 const router = createRouter({

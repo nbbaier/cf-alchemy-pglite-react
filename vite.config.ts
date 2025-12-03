@@ -22,5 +22,14 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		exclude: ["@electric-sql/pglite"],
+		esbuildOptions: {
+			target: "esnext",
+		},
+	},
+	build: {
+		target: "esnext",
+		rollupOptions: {
+			external: ["fs", "path", "crypto"],
+		},
 	},
 });
